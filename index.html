@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#09090b" />
+    <title>Tether — Claim Verification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="#"><span class="brand-mark">T</span><span>Tether</span></a>
+        <div class="engine"><i></i> NVIDIA Nemotron <span>Judge Engine</span></div>
+        <button class="export" id="exportButton">Generate Evidence Pack <span>↗</span></button>
+      </header>
+
+      <section class="intro"><p class="eyebrow">CREDIBILITY DECISION SYSTEM</p><h1>Make every claim<br /><em>stand up to proof.</em></h1><p>Tether audits student applications, portfolios, and proposals against their supporting evidence — before they are shared.</p></section>
+
+      <section class="workspace" aria-label="Tether claim audit workspace">
+        <aside class="panel input-panel">
+          <div class="panel-heading"><div><p class="eyebrow">01 / INPUT</p><h2>Draft & proof</h2></div><span class="counter">3 files</span></div>
+          <div class="tabs" role="tablist"><button class="active">Scholarship Essay</button><button>Resume</button><button>Proposal</button></div>
+          <label class="draft-label" for="draft">APPLICATION DRAFT</label>
+          <textarea id="draft">As founder of GreenLoop, I led a team of 12 students to build a campus composting platform used by 500 students. Our initiative diverted 40% of dining hall waste and raised $3,000 for local food security programs.</textarea>
+          <div class="dropzone" id="dropzone"><span class="upload-icon">↑</span><strong>Drop supporting evidence</strong><small>PDF, image, link, or note · max 10 MB</small><input id="fileInput" type="file" multiple hidden /></div>
+          <div class="files" id="files"><div class="file"><b>PDF</b><span><strong>GreenLoop_impact_report.pdf</strong><small>2 matched excerpts</small></span><button aria-label="Remove file">×</button></div><div class="file"><b class="image-file">IMG</b><span><strong>fundraiser_receipt.png</strong><small>1 matched excerpt</small></span><button aria-label="Remove file">×</button></div><div class="file"><b class="note-file">TXT</b><span><strong>advisor_confirmation.txt</strong><small>1 matched excerpt</small></span><button aria-label="Remove file">×</button></div></div>
+          <button class="audit-button" id="auditButton"><span>✦</span> Run Nemotron Audit</button>
+          <p class="privacy-note">Your sources stay private and are only used to verify this draft.</p>
+        </aside>
+
+        <section class="panel map-panel">
+          <div class="panel-heading"><div><p class="eyebrow">02 / TRUST MAP</p><h2>Verification index</h2></div><button class="icon-button" aria-label="Audit settings">•••</button></div>
+          <div class="score-area"><div class="gauge"><div class="gauge-inner"><strong id="score">78</strong><span>/ 100</span><small>TRUST SCORE</small></div></div><div class="score-copy"><p>Strong foundation</p><h3>Most impact claims are credible.</h3><span>Two details need more precise proof before publishing.</span></div></div>
+          <div class="metrics"><div><b>2</b><span>Verified</span></div><div><b>1</b><span>Needs proof</span></div><div><b>1</b><span>Privacy flag</span></div></div>
+          <div class="claim-title"><h3>Extracted claims</h3><span>4 reviewed</span></div>
+          <div class="claims" id="claims"></div>
+        </section>
+
+        <aside class="panel inspector">
+          <div class="panel-heading"><div><p class="eyebrow">03 / PROVENANCE</p><h2>Evidence inspector</h2></div><span class="live">LIVE</span></div>
+          <div id="inspectorContent"></div>
+          <div class="signoff"><div class="stamp">T</div><div><strong>Review-ready provenance</strong><p>Every published claim remains linked to its source.</p></div></div>
+        </aside>
+      </section>
+    </main>
+    <div class="toast" id="toast">Audit complete — 4 claims evaluated</div>
+    <script src="app.js"></script>
+  </body>
+</html>
