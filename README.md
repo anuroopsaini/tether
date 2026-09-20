@@ -27,7 +27,7 @@ uvicorn app.main:app --reload
 
 The API is available at `http://127.0.0.1:8000`; interactive OpenAPI documentation is at `/docs`.
 
-`MOCK_MODE=true` is the default. It provides deterministic, demo-safe claim decisions without an NVIDIA key. To use Nemotron, set `MOCK_MODE=false`, provide `NVIDIA_API_KEY`, and confirm `NEMOTRON_MODEL` in your NVIDIA dashboard.
+`MOCK_MODE=true` is the default. It provides deterministic, demo-safe claim decisions without a provider key. To use live Nemotron through Ollama Cloud, set `MOCK_MODE=false`, provide `OLLAMA_API_KEY`, and set `NEMOTRON_MODEL=nemotron-3-ultra:cloud`.
 
 ## API
 

@@ -204,8 +204,9 @@ async def health():
     settings = get_settings()
     return {
         "status": "ok",
+        "provider": "ollama",
         "nemotron": "mock"
         if settings.mock_mode
-        else ("configured" if settings.nvidia_api_key else "unconfigured"),
+        else ("configured" if settings.provider_api_key else "unconfigured"),
         "model": settings.nemotron_model,
     }

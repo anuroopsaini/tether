@@ -2,8 +2,8 @@ import re
 from pathlib import Path
 from typing import TypeVar
 
+import httpx
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
-from openai import AsyncOpenAI
 from pydantic import BaseModel, ValidationError
 
 from app.config import get_settings
@@ -28,22 +28,30 @@ def strip_fences(value: str) -> str:
 
 async def call_json(template: str, schema: type[T], **context: object) -> T:
     settings = get_settings()
-    if not settings.nvidia_api_key:
-        raise LLMFailure("NVIDIA_API_KEY is not configured")
+    if not settings.provider_api_key:
+        raise LLMFailure("OLLAMA_API_KEY is not configured")
     prompt = render_prompt(template, **context)
-    client = AsyncOpenAI(
-        base_url="https://integrate.api.nvidia.com/v1", api_key=settings.nvidia_api_key
-    )
     for attempt in range(2):
-        raw = (
-            await client.chat.completions.create(
-                model=settings.nemotron_model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1,
-                max_tokens=1800,
-                timeout=30,
-            )
-        ).choices[0].message.content or ""
+        try:
+            # Ultra prioritizes deep reasoning and can take longer than the
+            # previous fast model. Ask Ollama to enforce the target schema so
+            # its result remains safe to render in the claim dashboard.
+            async with httpx.AsyncClient(timeout=120) as client:
+                response = await client.post(
+                    "https://ollama.com/api/chat",
+                    headers={"Authorization": f"Bearer {settings.provider_api_key}"},
+                    json={
+                        "model": settings.nemotron_model,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "stream": False,
+                        "format": schema.model_json_schema(),
+                        "options": {"temperature": 0.1},
+                    },
+                )
+                response.raise_for_status()
+                raw = response.json()["message"]["content"]
+        except (httpx.HTTPError, KeyError, TypeError) as error:
+            raise LLMFailure(f"Ollama request failed: {error}") from error
         try:
             return schema.model_validate_json(strip_fences(raw))
         except ValidationError as error:

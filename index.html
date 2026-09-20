@@ -14,7 +14,7 @@
     <main class="shell">
       <header class="topbar">
         <a class="brand" href="#"><span class="brand-mark">T</span><span>Tether</span></a>
-        <div class="engine"><i></i> NVIDIA Nemotron <span>Judge Engine</span></div>
+        <div class="engine"><i></i> Ollama Cloud <span>Nemotron 3 Ultra</span></div>
         <button class="export" id="exportButton">Generate Evidence Pack <span>↗</span></button>
       </header>
 
@@ -22,12 +22,12 @@
 
       <section class="workspace" aria-label="Tether claim audit workspace">
         <aside class="panel input-panel">
-          <div class="panel-heading"><div><p class="eyebrow">01 / INPUT</p><h2>Draft & proof</h2></div><span class="counter">3 files</span></div>
-          <div class="tabs" role="tablist"><button class="active">Scholarship Essay</button><button>Resume</button><button>Proposal</button></div>
-          <label class="draft-label" for="draft">APPLICATION DRAFT</label>
-          <textarea id="draft">As founder of GreenLoop, I led a team of 12 students to build a campus composting platform used by 500 students. Our initiative diverted 40% of dining hall waste and raised $3,000 for local food security programs.</textarea>
+          <div class="panel-heading"><div><p class="eyebrow">01 / INPUT</p><h2>Draft & proof</h2></div><span class="counter">0 files</span></div>
+          <div class="tabs" role="tablist"><button class="active" data-doc-type="scholarship_essay" aria-selected="true">Scholarship Essay</button><button data-doc-type="resume" aria-selected="false">Resume</button><button data-doc-type="project_proposal" aria-selected="false">Proposal</button></div>
+          <label class="draft-label" id="draftLabel" for="draft">SCHOLARSHIP ESSAY DRAFT</label>
+          <textarea id="draft" placeholder="Paste the draft you want Tether to review. Claims are checked only against the proof files you add below."></textarea>
           <div class="dropzone" id="dropzone"><span class="upload-icon">↑</span><strong>Drop supporting evidence</strong><small>PDF, image, link, or note · max 10 MB</small><input id="fileInput" type="file" multiple hidden /></div>
-          <div class="files" id="files"><div class="file"><b>PDF</b><span><strong>GreenLoop_impact_report.pdf</strong><small>2 matched excerpts</small></span><button aria-label="Remove file">×</button></div><div class="file"><b class="image-file">IMG</b><span><strong>fundraiser_receipt.png</strong><small>1 matched excerpt</small></span><button aria-label="Remove file">×</button></div><div class="file"><b class="note-file">TXT</b><span><strong>advisor_confirmation.txt</strong><small>1 matched excerpt</small></span><button aria-label="Remove file">×</button></div></div>
+          <div class="files" id="files"></div>
           <button class="audit-button" id="auditButton"><span>✦</span> Run Nemotron Audit</button>
           <p class="privacy-note">Your sources stay private and are only used to verify this draft.</p>
         </aside>
