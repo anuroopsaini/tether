@@ -6,7 +6,7 @@ The repository includes a polished frontend demo plus a FastAPI/Nemotron evidenc
 
 ## Run locally
 
-Open `index.html` in a browser. No frontend dependency install is required.
+The server includes the built React workspace. Start the API, then open `http://127.0.0.1:8000`.
 
 ## Product flow
 
@@ -55,3 +55,5 @@ npm run dev
 ```
 
 Create a production bundle with `npm run build`.
+
+The built assets in `web/dist/` are committed because FastAPI serves them in production.
