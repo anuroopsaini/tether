@@ -15,7 +15,7 @@ from app.schemas import (
 )
 from app.services.match import top_matches
 from app.services.nemotron import LLMFailure, extract_claims, find_contradictions, judge_claim
-from app.services.privacy import find_pii
+from app.services.privacy import find_pii, redact_pii
 from app.services.scoring import ACTION_BY_VERDICT, COLOR_BY_VERDICT, summarize
 from app.services.store import progress, save
 
@@ -112,17 +112,47 @@ def mock_judgment(claim: ExtractedClaim, snippets: list) -> ClaimJudgment:
     )
 
 
+def next_steps_for(verdict: Verdict, claim: str) -> list[str]:
+    """Give students an actionable route to stronger proof, not a dead end."""
+    lower = claim.lower()
+    if verdict == Verdict.remove_sensitive_data:
+        return ["Remove personal contact details before sharing this document."]
+    if verdict == Verdict.publish:
+        return ["Keep the source available as a student-provided supporting record."]
+    steps = ["Ask an advisor or supervisor for a one-line confirmation email."]
+    if "$" in claim or "raised" in lower:
+        steps.insert(0, "Add a screenshot or receipt showing the final fundraiser total.")
+    elif "app" in lower or "user" in lower:
+        steps.insert(0, "Export an analytics page or ask your school for a usage confirmation.")
+    elif "%" in claim or "reduced" in lower:
+        steps.insert(0, "Add a before-and-after measurement or a short audit summary.")
+    else:
+        steps.insert(0, "Attach a dated document, link, or photo that supports this exact wording.")
+    return steps[:2]
+
+
+def narrative_skips(text: str, claims: list[ExtractedClaim]) -> list[str]:
+    claim_quotes = {claim.source_quote for claim in claims}
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    return [
+        sentence
+        for sentence in sentences
+        if sentence and sentence not in claim_quotes and not re.search(r"\d|\$|%", sentence)
+    ][:8]
+
+
 async def run_pipeline(analysis: Analysis) -> None:
     try:
         analysis.status = AnalysisStatus.processing
         save(analysis)
-        progress(analysis, "extracting", "Extracting factual claims from your draft")
+        progress(analysis, "extracting", "Finding factual claims while leaving personal narrative alone")
         settings = get_settings()
+        model_draft = redact_pii(analysis.draft_text)
         try:
             extracted = (
                 heuristic_claims(analysis.draft_text)
                 if settings.mock_mode
-                else await extract_claims(analysis.draft_text)
+                else await extract_claims(model_draft)
             )
         except LLMFailure:
             extracted = heuristic_claims(analysis.draft_text)
@@ -150,7 +180,12 @@ async def run_pipeline(analysis: Analysis) -> None:
                         mock_judgment(extracted_claim, candidates)
                         if settings.mock_mode
                         else await judge_claim(
-                            extracted_claim, [s.model_dump() for s in candidates]
+                            ExtractedClaim(
+                                claim=redact_pii(extracted_claim.claim),
+                                claim_type=extracted_claim.claim_type,
+                                source_quote=redact_pii(extracted_claim.source_quote),
+                            ),
+                            [{**s.model_dump(), "text": redact_pii(s.text)} for s in candidates],
                         )
                     )
             except Exception:
@@ -186,6 +221,9 @@ async def run_pipeline(analysis: Analysis) -> None:
                 missing_proof=judgment.missing_proof,
                 risk=judgment.risk,
                 safe_rewrite=judgment.safe_rewrite,
+                rewrite_options=judgment.rewrite_options
+                or [judgment.safe_rewrite, f"I contributed to {extracted_claim.claim.lstrip('I ').lower()}"],
+                next_steps=next_steps_for(judgment.verdict, extracted_claim.claim),
                 privacy_flags=judgment.privacy_flags,
                 provenance_note=judgment.provenance_note,
                 degraded=degraded,
@@ -208,6 +246,9 @@ async def run_pipeline(analysis: Analysis) -> None:
             claims=claims,
             contradictions=contradictions,
             privacy_flags=list(set(privacy)),
+            skipped_statements=narrative_skips(analysis.draft_text, extracted)
+            if analysis.doc_type in {"essay", "scholarship_essay", "application"}
+            else [],
         )
         analysis.status = AnalysisStatus.complete
         progress(analysis, "done", "Analysis complete")

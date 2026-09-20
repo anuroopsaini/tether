@@ -11,3 +11,10 @@ PATTERNS = {
 
 def find_pii(text: str) -> list[str]:
     return [label for label, pattern in PATTERNS.items() if re.search(pattern, text, re.IGNORECASE)]
+
+
+def redact_pii(text: str) -> str:
+    """Remove deterministic identifiers before any text is sent to a model."""
+    for label, pattern in PATTERNS.items():
+        text = re.sub(pattern, f"[{label.upper().replace(' ', '_')} REDACTED]", text, flags=re.IGNORECASE)
+    return text

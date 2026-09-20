@@ -4,6 +4,13 @@ from app.schemas import Analysis, ProgressEvent
 _analyses: dict[str, Analysis] = {}
 
 
+def delete(analysis_id: str) -> None:
+    _analyses.pop(analysis_id, None)
+    path = get_settings().data_dir / f"{analysis_id}.json"
+    if path.exists():
+        path.unlink()
+
+
 def save(analysis: Analysis) -> None:
     _analyses[analysis.id] = analysis
     path = get_settings().data_dir / f"{analysis.id}.json"

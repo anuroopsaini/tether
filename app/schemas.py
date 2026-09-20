@@ -63,7 +63,10 @@ class Claim(BaseModel):
     missing_proof: list[str] = Field(default_factory=list)
     risk: str
     safe_rewrite: str
+    rewrite_options: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
     accepted_rewrite: str | None = None
+    user_feedback: Literal["verified_by_student", "disagrees"] | None = None
     privacy_flags: list[str] = Field(default_factory=list)
     provenance_note: str = ""
     degraded: bool = False
@@ -83,6 +86,7 @@ class Summary(BaseModel):
     evidence_backed: int
     needing_changes: int
     privacy_flags: int
+    support_range: Literal["strong", "mixed", "limited"] = "limited"
 
 
 class AnalysisResult(BaseModel):
@@ -90,6 +94,7 @@ class AnalysisResult(BaseModel):
     claims: list[Claim]
     contradictions: list[str] = Field(default_factory=list)
     privacy_flags: list[str] = Field(default_factory=list)
+    skipped_statements: list[str] = Field(default_factory=list)
 
 
 class Analysis(BaseModel):
@@ -109,6 +114,10 @@ class Analysis(BaseModel):
 class CreatedAnalysis(BaseModel):
     id: str
     status: AnalysisStatus
+
+
+class ClaimFeedback(BaseModel):
+    choice: Literal["verified_by_student", "disagrees"]
 
 
 class ErrorDetail(BaseModel):
@@ -135,6 +144,7 @@ class ClaimJudgment(BaseModel):
     missing_proof: list[str] = Field(default_factory=list)
     risk: str
     safe_rewrite: str
+    rewrite_options: list[str] = Field(default_factory=list)
     privacy_flags: list[str] = Field(default_factory=list)
     provenance_note: str = ""
 

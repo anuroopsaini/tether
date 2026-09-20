@@ -126,7 +126,7 @@ def test_evidence_pack_preview_and_pdf_contract():
     preview = client.get(f"/api/analyses/{analysis['id']}/evidence-pack/preview")
     assert preview.status_code == 200
     assert preview.headers["content-type"].startswith("text/html")
-    assert "Tether Evidence Pack" in preview.text
+    assert "Tether Supporting Appendix" in preview.text
 
     pdf = client.get(f"/api/analyses/{analysis['id']}/evidence-pack")
     assert pdf.status_code == 200

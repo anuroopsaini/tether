@@ -24,10 +24,13 @@ def summarize(claims: list[Claim], contradictions: list[str], privacy_flags: lis
     score = int(100 * sum(WEIGHTS[c.verdict] for c in claims) / max(len(claims), 1)) - 5 * len(
         contradictions
     )
+    supported = sum(c.color == "green" for c in claims)
+    ratio = supported / max(len(claims), 1)
     return Summary(
         trust_score=max(0, min(100, score)),
         claims_reviewed=len(claims),
-        evidence_backed=sum(c.color == "green" for c in claims),
+        evidence_backed=supported,
         needing_changes=sum(c.color in {"yellow", "red"} for c in claims),
         privacy_flags=len(privacy_flags),
+        support_range="strong" if ratio >= 0.7 else "mixed" if ratio >= 0.35 else "limited",
     )

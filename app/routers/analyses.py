@@ -6,11 +6,19 @@ from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, Query
 from fastapi.responses import HTMLResponse, Response, StreamingResponse
 
 from app.config import get_settings
-from app.schemas import Analysis, AnalysisStatus, Claim, CreatedAnalysis, Evidence, HealthResponse
+from app.schemas import (
+    Analysis,
+    AnalysisStatus,
+    Claim,
+    ClaimFeedback,
+    CreatedAnalysis,
+    Evidence,
+    HealthResponse,
+)
 from app.services.extract import extract_upload, extract_url, note_evidence
 from app.services.pack import pdf_pack, render_pack
 from app.services.pipeline import run_pipeline
-from app.services.store import get, save
+from app.services.store import delete, get, save
 
 router = APIRouter(prefix="/api", tags=["analyses"])
 
@@ -149,6 +157,25 @@ async def accept_rewrite(analysis_id: str, claim_id: str):
     claim.accepted_rewrite = claim.safe_rewrite
     save(analysis)
     return claim
+
+
+@router.post("/analyses/{analysis_id}/claims/{claim_id}/feedback", response_model=Claim)
+async def claim_feedback(analysis_id: str, claim_id: str, feedback: ClaimFeedback):
+    analysis = require(analysis_id)
+    if not analysis.result:
+        raise HTTPException(409, detail={"error": {"code": "NOT_READY", "message": "Analysis is not complete"}})
+    claim = next((item for item in analysis.result.claims if item.id == claim_id), None)
+    if not claim:
+        raise HTTPException(404, detail={"error": {"code": "CLAIM_NOT_FOUND", "message": "Claim not found"}})
+    claim.user_feedback = feedback.choice
+    save(analysis)
+    return claim
+
+
+@router.delete("/analyses/{analysis_id}", status_code=204)
+async def delete_analysis(analysis_id: str):
+    require(analysis_id)
+    delete(analysis_id)
 
 
 @router.get("/analyses/{analysis_id}/evidence-pack")

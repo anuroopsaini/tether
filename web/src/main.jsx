@@ -8,7 +8,7 @@ import "./styles.css";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
 
 const nav = [{ label: "Workspace", icon: LayoutDashboard }, { label: "Analyses", icon: ClipboardCheck }, { label: "Evidence Packs", icon: FolderOpen }, { label: "Settings", icon: Settings }];
-const labels = { publish: "Verified", soften: "Refine", needs_evidence: "Needs proof", remove_sensitive_data: "Private" };
+const labels = { publish: "Supported by your evidence", soften: "Partially supported", needs_evidence: "No evidence found", remove_sensitive_data: "Contains private info" };
 const recommendation = claim => claim.accepted_rewrite || claim.safe_rewrite || claim.action;
 const errorMessage = body => body?.error?.message || "Tether could not complete that request.";
 const readJson = async response => {
@@ -59,7 +59,7 @@ function CreateAnalysis({ onSubmit, busy, message }) {
   const [docType, setDocType] = useState("essay");
   const [draft, setDraft] = useState("");
   const [files, setFiles] = useState([]);
-  const submit = event => { event.preventDefault(); onSubmit({ docType, draft, files }); };
+  const submit = event => { event.preventDefault(); if (!window.confirm("I understand that Tether will analyze this material, that student-provided sources are not independently authenticated, and that I should not upload private information I do not want reviewed.")) return; onSubmit({ docType, draft, files }); };
   return <main className="content"><Topbar title="New analysis"/><form className="create-grid" onSubmit={submit}><section className="panel create-panel"><div className="panel-head"><div><h2>Draft & evidence</h2><p>Use a draft, a proof file, or both. A readable PDF, DOCX, TXT, note, or URL can stand alone.</p></div></div><label>Document type<select value={docType} onChange={event => setDocType(event.target.value)}><option value="essay">Essay</option><option value="resume">Resume</option><option value="project_proposal">Project proposal</option><option value="application">Application</option></select></label><label>Draft <span className="field-optional">Optional when you attach proof</span><textarea className="draft-input" value={draft} onChange={event => setDraft(event.target.value)} placeholder="Paste your essay, résumé, application, or proposal."/></label><label>Supporting evidence <input type="file" multiple onChange={event => setFiles([...event.target.files].slice(0, 3))}/><small>{files.length ? `${files.length} file${files.length === 1 ? "" : "s"} selected` : "Up to three files, 10 MB each. A readable file can be analyzed on its own."}</small></label>{message ? <p className="form-message">{message}</p> : null}<div className="form-actions"><Button variant="secondary" type="button" onClick={() => setDraft("")}>Clear</Button><Button icon={Sparkles} type="submit" disabled={busy || (!draft.trim() && !files.length)}>{busy ? "Analyzing…" : "Run Nemotron audit"}</Button></div></section><aside className="panel compact form-aside"><span className="label">WHAT TETHER CHECKS</span><div className="step"><span>01</span><div><b>Exact support</b><small>Claims are matched to supplied evidence.</small></div></div><div className="step"><span>02</span><div><b>Privacy risk</b><small>Personal data is flagged before sharing.</small></div></div><div className="step"><span>03</span><div><b>Safe wording</b><small>Receive a concrete, credible rewrite.</small></div></div></aside></form></main>;
 }
 

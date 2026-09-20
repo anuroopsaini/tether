@@ -1,21 +1,39 @@
 # Tether
 
-Tether is an evidence-backed claim checker for student applications, essays, resumes, and project proposals. It turns a draft and optional proof into a reviewer-friendly Trust Map and Evidence Pack.
+> **Every claim, tethered to proof.**
 
-The repository includes a polished frontend demo plus a FastAPI/Nemotron evidence-analysis backend.
+Tether is a pre-submission coach for scholarship and college applications. It helps students find claims that need stronger evidence, safer wording, or privacy cleanup before they submit.
+
+Tether does not certify claims or independently authenticate sources. Students see the matched source, choose whether to revise, and decide what—if anything—to attach.
+
+## What Tether does
+
+- Extracts factual, checkable claims from a draft or readable proof file.
+- Uses Narrative Mode to leave reflective essay language alone and show what was skipped.
+- Matches claims to student-provided sources and explains the match.
+- Gives specific next steps for weak claims: advisor confirmations, analytics exports, receipts, and screenshots.
+- Redacts deterministic PII before any text is sent to a live model.
+- Offers rewrite suggestions without auto-applying them.
+- Produces an optional Supporting Appendix for programs that permit attachments.
+
+## Honest claim guidance
+
+| Tether says | Meaning |
+| --- | --- |
+| Supported by your evidence | A supplied source is relevant to the exact claim. |
+| Partially supported | The source is related, but the wording or number needs care. |
+| No evidence found | Add proof, soften the language, or remove the claim. |
+| Contains private info | Remove or redact personal data before sharing. |
+
+Sources are always labeled **student-provided**. Tether matches source text; it does not independently verify authenticity.
+
+## Privacy and student control
+
+- Upload consent is required in the product before analysis.
+- Use **Delete my data** to remove a saved analysis from the local Tether store.
+- Rewrites are suggestions. Students should follow their program’s AI-writing policy and submit only work they approve.
 
 ## Run locally
-
-The server includes the built React workspace. Start the API, then open `http://127.0.0.1:8000`.
-
-## Product flow
-
-1. Add a scholarship essay, resume, or proposal and supporting evidence.
-2. Run the Nemotron audit.
-3. Review claim-level confidence, source provenance, safe rewrites, and privacy flags.
-4. Export the resulting Evidence Pack from the browser print dialog.
-
-## Backend
 
 ```bash
 python -m venv .venv
@@ -25,28 +43,9 @@ cp .env.example .env
 uvicorn app.main:app --reload
 ```
 
-The API is available at `http://127.0.0.1:8000`; interactive OpenAPI documentation is at `/docs`.
-
-`MOCK_MODE=true` is the default. It provides deterministic, demo-safe claim decisions without a provider key. To use live Nemotron through Ollama Cloud, set `MOCK_MODE=false`, provide `OLLAMA_API_KEY`, and set `NEMOTRON_MODEL=nemotron-3-ultra:cloud`.
-
-## API
-
-- `POST /api/analyses` - multipart upload (`doc_type`, `draft_text`, optional `files`, `notes`, `urls`)
-- `GET /api/analyses/{id}` - result and progress
-- `GET /api/analyses/{id}/events` - server-sent progress events
-- `POST /api/analyses/{id}/claims/{claim_id}/accept-rewrite`
-- `GET /api/analyses/{id}/evidence-pack` - PDF download
-- `GET /api/analyses/{id}/evidence-pack/preview` - server-rendered HTML
-- `POST /api/demo` - sample analysis across green/yellow/red/purple verdicts
-- `GET /api/health`
-
-## Guardrails
-
-The model only judges candidate evidence selected by deterministic retrieval. Evidence IDs returned by the model are validated in code, and a claim cannot be marked publishable without a validated evidence snippet. Scores are computed in code so they are stable and explainable.
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000). `MOCK_MODE=true` gives deterministic demo decisions. Set `MOCK_MODE=false` and `OLLAMA_API_KEY` for live Nemotron evaluation.
 
 ## Frontend
-
-The React/Vite workspace lives in `web/` and provides a compact, dark-mode product UI with Workspace, Analyses, claim review, Evidence Packs, and Settings screens.
 
 ```bash
 cd web
@@ -54,6 +53,21 @@ npm install
 npm run dev
 ```
 
-Create a production bundle with `npm run build`.
+The browser fallback reviews pasted text and readable PDF, DOCX, and TXT files when no FastAPI service is available. For server-side privacy safeguards, PDF export, and live Nemotron evaluation, run FastAPI alongside the UI.
 
-The built assets in `dist/` are committed because FastAPI serves them in production.
+## API
+
+- `POST /api/analyses` — draft and/or uploaded evidence
+- `GET /api/analyses/{id}` — analysis, coaching steps, and narrative skips
+- `POST /api/analyses/{id}/claims/{claim_id}/accept-rewrite`
+- `POST /api/analyses/{id}/claims/{claim_id}/feedback`
+- `DELETE /api/analyses/{id}` — delete saved data
+- `GET /api/analyses/{id}/evidence-pack` and `/preview`
+- `POST /api/demo` · `GET /api/health`
+
+## Development checks
+
+```bash
+.venv/bin/pytest -q
+.venv/bin/ruff check app tests
+```
