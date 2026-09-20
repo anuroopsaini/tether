@@ -43,3 +43,15 @@ The API is available at `http://127.0.0.1:8000`; interactive OpenAPI documentati
 ## Guardrails
 
 The model only judges candidate evidence selected by deterministic retrieval. Evidence IDs returned by the model are validated in code, and a claim cannot be marked publishable without a validated evidence snippet. Scores are computed in code so they are stable and explainable.
+
+## Frontend
+
+The React/Vite workspace lives in `web/` and provides a compact, dark-mode product UI with Workspace, Analyses, claim review, Evidence Packs, and Settings screens.
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Create a production bundle with `npm run build`.
