@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { ArrowUpRight, Check, ChevronRight, CircleHelp, ClipboardCheck, Download, FileCheck2, FileText, Flag, FolderOpen, LayoutDashboard, MoreHorizontal, Plus, Search, Settings, ShieldCheck, Sparkles, Upload, X } from "lucide-react";
+import { ArrowUpRight, Check, ChevronRight, CircleHelp, ClipboardCheck, Download, FileCheck2, FileText, Flag, FolderOpen, LayoutDashboard, MoreHorizontal, Plus, Search, Settings, Sparkles, Upload, X } from "lucide-react";
 import "./styles.css";
 
 const nav = [{ label: "Workspace", icon: LayoutDashboard }, { label: "Analyses", icon: ClipboardCheck }, { label: "Evidence Packs", icon: FolderOpen }, { label: "Settings", icon: Settings }];
@@ -17,7 +17,7 @@ function Button({ children, variant = "default", icon: Icon, ...props }) { retur
 function Badge({ children, color = "neutral" }) { return <span className={`badge ${color}`}>{children}</span>; }
 function Score({ value }) { return <div className="score"><strong>{value}</strong><span>/100</span></div>; }
 
-function Sidebar({ page, setPage }) { return <aside className="sidebar"><div className="brand"><span className="brand-mark"><ShieldCheck size={17}/></span><span>Tether</span></div><nav>{nav.map(({label, icon: Icon}) => <button key={label} onClick={() => setPage(label)} className={`nav-item ${page === label ? "active" : ""}`}><Icon size={16}/><span>{label}</span></button>)}</nav><div className="sidebar-bottom"><button className="nav-item"><CircleHelp size={16}/><span>Help center</span></button><div className="user"><span className="avatar">AS</span><span><b>Anuroop Saini</b><small>Student workspace</small></span><MoreHorizontal size={16}/></div></div></aside> }
+function Sidebar({ page, setPage }) { return <aside className="sidebar"><div className="brand"><img className="brand-logo" src="/tether-bird-logo.png" alt="Tether logo"/><span>Tether</span></div><nav>{nav.map(({label, icon: Icon}) => <button key={label} onClick={() => setPage(label)} className={`nav-item ${page === label ? "active" : ""}`}><Icon size={16}/><span>{label}</span></button>)}</nav><div className="sidebar-bottom"><button className="nav-item"><CircleHelp size={16}/><span>Help center</span></button><div className="user"><span className="avatar">AS</span><span><b>Anuroop Saini</b><small>Student workspace</small></span><MoreHorizontal size={16}/></div></div></aside> }
 function Topbar({ title, action }) { return <header className="topbar"><div><span className="eyebrow">TETHER / {title.toUpperCase()}</span><h1>{title}</h1></div>{action}</header> }
 function Stat({ label, value, note }) { return <div className="stat"><span>{label}</span><strong>{value}</strong><small>{note}</small></div> }
 
