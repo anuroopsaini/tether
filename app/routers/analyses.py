@@ -6,7 +6,7 @@ from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, Query
 from fastapi.responses import HTMLResponse, Response, StreamingResponse
 
 from app.config import get_settings
-from app.schemas import Analysis, AnalysisStatus, CreatedAnalysis, Evidence
+from app.schemas import Analysis, AnalysisStatus, Claim, CreatedAnalysis, Evidence, HealthResponse
 from app.services.extract import extract_upload, extract_url, note_evidence
 from app.services.pack import pdf_pack, render_pack
 from app.services.pipeline import run_pipeline
@@ -95,7 +95,7 @@ async def events(analysis_id: str):
         while True:
             analysis = require(analysis_id)
             while sent < len(analysis.progress):
-                yield f"data: {analysis.progress[sent].model_dump_json()}\n\n"
+                yield f"event: progress\ndata: {analysis.progress[sent].model_dump_json()}\n\n"
                 sent += 1
             if analysis.status in {AnalysisStatus.complete, AnalysisStatus.failed}:
                 yield f"event: complete\ndata: {json.dumps({'status': analysis.status})}\n\n"
@@ -109,7 +109,10 @@ async def events(analysis_id: str):
     )
 
 
-@router.post("/analyses/{analysis_id}/claims/{claim_id}/accept-rewrite")
+@router.post(
+    "/analyses/{analysis_id}/claims/{claim_id}/accept-rewrite",
+    response_model=Claim,
+)
 async def accept_rewrite(analysis_id: str, claim_id: str):
     analysis = require(analysis_id)
     if not analysis.result:
@@ -199,7 +202,7 @@ async def demo(background_tasks: BackgroundTasks):
     return CreatedAnalysis(id=analysis.id, status=analysis.status)
 
 
-@router.get("/health")
+@router.get("/health", response_model=HealthResponse)
 async def health():
     settings = get_settings()
     return {

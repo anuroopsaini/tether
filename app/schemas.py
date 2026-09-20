@@ -111,6 +111,22 @@ class CreatedAnalysis(BaseModel):
     status: AnalysisStatus
 
 
+class ErrorDetail(BaseModel):
+    code: str
+    message: str
+
+
+class ErrorResponse(BaseModel):
+    error: ErrorDetail
+
+
+class HealthResponse(BaseModel):
+    status: Literal["ok"]
+    provider: str
+    nemotron: Literal["mock", "configured", "unconfigured"]
+    model: str
+
+
 class ClaimJudgment(BaseModel):
     verdict: Verdict
     confidence: float = Field(ge=0, le=1)

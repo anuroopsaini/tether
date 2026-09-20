@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     nvidia_api_key: str | None = None
     nemotron_model: str = "nemotron-3-ultra:cloud"
     mock_mode: bool = True
-    allowed_origins: str = "http://localhost:3000"
+    allowed_origins: str = "http://localhost:3000,http://localhost:5173"
     max_file_size_mb: int = 10
     data_dir: Path = Path("data")
 
