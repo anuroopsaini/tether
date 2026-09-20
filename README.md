@@ -1,37 +1,51 @@
 # Tether
 
-> **Every claim, tethered to proof.**
+## Purpose
 
-Tether is a pre-submission coach for scholarship and college applications. It helps students find claims that need stronger evidence, safer wording, or privacy cleanup before they submit.
+### What Tether is
 
-Tether does not certify claims or independently authenticate sources. Students see the matched source, choose whether to revise, and decide what—if anything—to attach.
+Tether checks student drafts claim by claim against the student's own proof, so they can submit work they can back up.
 
-## What Tether does
+### The problem
 
-- Extracts factual, checkable claims from a draft or readable proof file.
-- Uses Narrative Mode to leave reflective essay language alone and show what was skipped.
-- Matches claims to student-provided sources and explains the match.
-- Gives specific next steps for weak claims: advisor confirmations, analytics exports, receipts, and screenshots.
-- Redacts deterministic PII before any text is sent to a live model.
-- Offers rewrite suggestions without auto-applying them.
-- Produces an optional Supporting Appendix for programs that permit attachments.
+Students submit scholarship essays, college applications, resumes, club proposals, and research summaries. The writing is rarely the issue. The claims can be vague, inflated, unsupported, or expose personal data such as phone numbers and addresses.
 
-## Honest claim guidance
+For example, a student may write “Led a team of 12,” “Raised $3,000,” or “Built an app used by 500 students.” Each statement may be true, but it can be hard to tell whether the supplied material supports the exact wording.
 
-| Tether says | Meaning |
+### How it works
+
+1. The student pastes a draft and adds proof, including files, links, or notes.
+2. Tether extracts factual claims from the supplied text.
+3. It finds the parts of the proof that relate to each claim.
+4. Nemotron judges whether the supplied proof supports the exact claim.
+5. Tether scores the draft and generates the results.
+
+### The four verdicts
+
+| Label | Meaning |
 | --- | --- |
-| Supported by your evidence | A supplied source is relevant to the exact claim. |
-| Partially supported | The source is related, but the wording or number needs care. |
-| No evidence found | Add proof, soften the language, or remove the claim. |
-| Contains private info | Remove or redact personal data before sharing. |
+| Verified | Backed by the evidence supplied. |
+| Refine | Plausible, but needs specifics or softer wording. |
+| Needs proof | Unsupported or conflicting. |
+| Private | Contains personal data to remove before sharing. |
 
-Sources are always labeled **student-provided**. Tether matches source text; it does not independently verify authenticity.
+### What the student gets
 
-## Privacy and student control
+Tether provides a claim-by-claim credibility view, the missing proof for each weak claim, and a safer suggested rewrite. It can also create a reviewer-friendly Evidence Pack that pairs a claim with supporting evidence and a short note about where that evidence came from. Evidence is student-provided; Tether matches source text and does not independently authenticate it.
 
-- Upload consent is required in the product before analysis.
-- Use **Delete my data** to remove a saved analysis from the local Tether store.
-- Rewrites are suggestions. Students should follow their program’s AI-writing policy and submit only work they approve.
+### Who it's for
+
+Tether is for students preparing submissions and reviewers who need to trust a submission quickly. It is designed around scholarship and college-application materials, while also supporting resumes, proposals, and research summaries.
+
+### What Tether is not
+
+It is not a chatbot, it does not write the essay, and it does not decide who gets accepted. It gives the student clear decisions about their own claims, and the student stays in control of what is submitted.
+
+### A before and after example
+
+“Built an app used by 500 students” is marked Needs proof, with the suggested rewrite “Built an app piloted with students at my school.”
+
+Students shouldn't need to exaggerate to stand out. Tether helps them turn real work into claims they can prove.
 
 ## Run locally
 
