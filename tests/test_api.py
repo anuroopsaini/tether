@@ -57,6 +57,20 @@ def test_create_analysis_and_get_analysis_contract():
     assert body["result"] is not None
 
 
+def test_evidence_file_can_be_analyzed_without_a_draft():
+    created = client.post(
+        "/api/analyses",
+        data={"doc_type": "resume", "draft_text": ""},
+        files={"files": ("project.txt", b"I raised $500 and led a team of 4 students.", "text/plain")},
+    )
+
+    assert created.status_code == 202
+    analysis = client.get(f"/api/analyses/{created.json()['id']}")
+    assert analysis.status_code == 200
+    assert "raised $500" in analysis.json()["draft_text"]
+    assert analysis.json()["result"] is not None
+
+
 def test_demo_contract_includes_all_trust_map_colors():
     analysis = complete_demo()
     result = analysis["result"]
@@ -131,7 +145,7 @@ def test_api_errors_use_a_consistent_envelope():
     }
     assert invalid.status_code == 422
     assert set(invalid.json()) == {"error"}
-    assert invalid.json()["error"]["code"] in {"MISSING_DRAFT", "VALIDATION_ERROR"}
+    assert invalid.json()["error"]["code"] in {"MISSING_INPUT", "VALIDATION_ERROR"}
     assert isinstance(invalid.json()["error"]["message"], str)
 
 

@@ -58,23 +58,45 @@ async def prepare_evidence(files: list[UploadFile], notes: str, urls: list[str])
 async def create_analysis(
     background_tasks: BackgroundTasks,
     doc_type: str = Form(...),
-    draft_text: str = Form(...),
+    draft_text: str = Form(""),
     notes: str = Form(""),
     urls: list[str] = Form(default=[]),
     files: list[UploadFile] = File(default=[]),
 ):
-    if not draft_text.strip():
+    evidence = await prepare_evidence(files, notes, urls)
+    if not draft_text.strip() and not evidence:
         raise HTTPException(
-            422, detail={"error": {"code": "MISSING_DRAFT", "message": "draft_text is required"}}
+            422,
+            detail={
+                "error": {
+                    "code": "MISSING_INPUT",
+                    "message": "Provide a draft or at least one evidence source",
+                }
+            },
+        )
+    # An uploaded PDF, DOCX, note, or URL can stand alone as the work sample.
+    # Its extracted text becomes the claim-extraction source when no draft is pasted.
+    source_text = draft_text.strip() or "\n\n".join(
+        item.extracted_text for item in evidence if item.extracted_text.strip()
+    )
+    if not source_text.strip():
+        raise HTTPException(
+            422,
+            detail={
+                "error": {
+                    "code": "NO_EXTRACTABLE_TEXT",
+                    "message": "No readable text was found in the supplied evidence",
+                }
+            },
         )
     analysis = Analysis(
         id=str(uuid4()),
         status=AnalysisStatus.queued,
         doc_type=doc_type,
-        draft_text=draft_text,
+        draft_text=source_text,
         notes=notes,
         urls=urls,
-        evidence=await prepare_evidence(files, notes, urls),
+        evidence=evidence,
     )
     save(analysis)
     background_tasks.add_task(run_pipeline, analysis)
