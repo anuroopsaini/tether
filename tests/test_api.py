@@ -106,7 +106,7 @@ def test_accept_rewrite_returns_updated_claim_contract():
     assert returned["accepted_rewrite"] == returned["safe_rewrite"]
 
 
-def test_evidence_pack_preview_and_pdf_contract(monkeypatch):
+def test_evidence_pack_preview_and_pdf_contract():
     analysis = complete_demo()
 
     preview = client.get(f"/api/analyses/{analysis['id']}/evidence-pack/preview")
@@ -114,7 +114,6 @@ def test_evidence_pack_preview_and_pdf_contract(monkeypatch):
     assert preview.headers["content-type"].startswith("text/html")
     assert "Tether Evidence Pack" in preview.text
 
-    monkeypatch.setattr("app.routers.analyses.pdf_pack", lambda _analysis, _notes: b"%PDF-1.4\n")
     pdf = client.get(f"/api/analyses/{analysis['id']}/evidence-pack")
     assert pdf.status_code == 200
     assert pdf.headers["content-type"] == "application/pdf"
