@@ -24,5 +24,5 @@ app.include_router(router)
 
 # Keep the dashboard and API in one deployable application. The API routes above
 # take precedence; all other root paths resolve to the static frontend.
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "web" / "dist"
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "dist"
 app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

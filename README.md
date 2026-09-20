@@ -56,4 +56,4 @@ npm run dev
 
 Create a production bundle with `npm run build`.
 
-The built assets in `web/dist/` are committed because FastAPI serves them in production.
+The built assets in `dist/` are committed because FastAPI serves them in production.
